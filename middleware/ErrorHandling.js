@@ -9,6 +9,7 @@ import ApiError from '../error/ApiError.js'
  * @param {express.NextFunction} next
  */
 //next() не используем так как последний в списке
+//выводим ошибку такую как нам надо
 const error = (err, req, res, next) => {
   if (err instanceof ApiError) {
     return res.status(err.status).json({message: err.message})
