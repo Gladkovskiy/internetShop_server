@@ -1,7 +1,11 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import fileUpload from 'express-fileupload'
+import path from 'path'
 
+//конфигурация подключения к БД
 import onlineStore from './db.js'
+//настройка таблиц в базе данных
 import * as models from './models/models.js'
 import router from './routes/index.js'
 import errorHandler from './middleware/ErrorHandling.js'
@@ -14,6 +18,10 @@ const app = express()
 //для распознавания json в  запросе
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
+//статическая раздача файлов
+app.use(express.static(path.resolve(path.resolve(), 'static')))
+//чтобы работал req.files для передачи файлов
+app.use(fileUpload({}))
 app.use('/api', router)
 
 //обработчик ошибок полдений Middleware
