@@ -22,7 +22,7 @@ const roleVerify = role => {
       const jwtToken = req.headers.authorization.split(' ')[1] //токен 2е слово
       //если токена нет то пшим сообщение не авторизирован
 
-      if (!jwtToken) {
+      if (jwtToken === 'null') {
         return res.status(401).json({message: 'Пользователь не авторизован'})
       }
 

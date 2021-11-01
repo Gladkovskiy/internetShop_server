@@ -28,15 +28,15 @@ export const registration = async (req, res, next) => {
 
     //проверяем введены ли пароль и почта
     if (!email || !password) {
-      return next(ApiError.badRequest('Некорректный email или password'))
+      next(ApiError.badRequest('Некорректный email или password'))
     }
 
     //проверяем существует ли такая почта
     const candidate = await User.findOne({where: {email}})
     if (candidate) {
-      return next(ApiError.badRequest('Пользователь с таким именем существует'))
+      next(ApiError.badRequest('Пользователь с таким именем существует'))
     }
-
+    console.log(1)
     //хэшируем пароль
     const hashPassword = await bcrypt.hash(password, 5)
     //записуем в базу пользовательскте данные
@@ -47,7 +47,7 @@ export const registration = async (req, res, next) => {
     //создаём токен
     const jwtToken = jwtCreate(user.id, user.mail, user.role)
 
-    return res.json({token: jwtToken})
+    res.json({token: jwtToken})
   } catch (error) {
     next(ApiError.badRequest(error.message))
   }
@@ -66,19 +66,19 @@ export const login = async (req, res, next) => {
     //ищем пользователя, если нет выводим сообщение что такого нет
     const user = await User.findOne({where: {email}})
     if (!user) {
-      return next(ApiError.internal('Пользователь с таким именем не найден'))
+      next(ApiError.internal('Пользователь с таким именем не найден'))
     }
 
     //если есть пользователь, сравниваем пароли, не совпали Неверный пароль
     let comparePassword = bcrypt.compareSync(password, user.password)
     if (!comparePassword) {
-      return next(ApiError.internal('Неверный пароль'))
+      next(ApiError.internal('Неверный пароль'))
     }
 
     //всё совпало генерируем токен и возвращаем на frontend
     const jwtToken = jwtCreate(user.id, user.email, user.role)
 
-    return res.json({token: jwtToken})
+    res.json({token: jwtToken})
   } catch (error) {
     next(ApiError.internal(error.message))
   }
@@ -94,5 +94,5 @@ export const check = async (req, res) => {
   //до этого проверили на валидность, если прошёл прошлую authMiddleware
   //то создаём новый токен и передаём на frontEnd
   const token = jwtCreate(req.user.id, req.user.email, req.user.role)
-  return res.json({token})
+  res.json({token})
 }

@@ -7,5 +7,6 @@ const router = new express.Router()
 
 router.post('/', checkRole('ADMIN'), brandController.create)
 router.get('/', brandController.getAll)
+router.delete('/', checkRole('ADMIN'), brandController.deleteOne)
 
 export default router

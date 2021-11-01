@@ -42,7 +42,7 @@ export const create = async (req, res, next) => {
       })
     }
 
-    return res.json(device)
+    res.json(device)
   } catch (e) {
     next(ApiError.badRequest(e.message))
   }
@@ -53,35 +53,39 @@ export const create = async (req, res, next) => {
  * @param {express.Request} req
  * @param {express.Response} res
  */
-export const getAll = async (req, res) => {
-  let {brandId, typeId, limit, page} = req.query
-  let devices //массив с отфильтрованым товаром
+export const getAll = async (req, res, next) => {
+  try {
+    let {brandId, typeId, limit, page} = req.query
+    let devices //массив с отфильтрованым товаром
 
-  //ограничение в показе товара на странице
-  page = page || 1 //номер страницы
-  limit = limit || 9 //количество товара на странице
-  let offset = page * limit - limit //начиная с какого элемента показывать
+    //ограничение в показе товара на странице
+    page = page || 1 //номер страницы
+    limit = limit || 9 //количество товара на странице
+    let offset = page * limit - limit //начиная с какого элемента показывать
 
-  if (!brandId && !typeId) {
-    //findandCountAll возвращает не массив а объект с count и массив row
-    //count общее количество товара, row - массив товара
-    devices = await Device.findAndCountAll({limit, offset})
-  }
-  if (brandId && !typeId) {
-    devices = await Device.findAndCountAll({where: {brandId}, limit, offset})
-  }
-  if (!brandId && typeId) {
-    devices = await Device.findAndCountAll({where: {typeId}, limit, offset})
-  }
-  if (brandId && typeId) {
-    devices = await Device.findAndCountAll({
-      where: {brandId, typeId},
-      limit,
-      offset,
-    })
-  }
+    if (!brandId && !typeId) {
+      //findandCountAll возвращает не массив а объект с count и массив row
+      //count общее количество товара, row - массив товара
+      devices = await Device.findAndCountAll({limit, offset})
+    }
+    if (brandId && !typeId) {
+      devices = await Device.findAndCountAll({where: {brandId}, limit, offset})
+    }
+    if (!brandId && typeId) {
+      devices = await Device.findAndCountAll({where: {typeId}, limit, offset})
+    }
+    if (brandId && typeId) {
+      devices = await Device.findAndCountAll({
+        where: {brandId, typeId},
+        limit,
+        offset,
+      })
+    }
 
-  return res.json(devices)
+    res.json(devices)
+  } catch (e) {
+    next(ApiError.badRequest(e.message))
+  }
 }
 
 /**
@@ -98,5 +102,5 @@ export const getOne = async (req, res) => {
     //так можно подтягивать данные с других баз подвязанных к этой
     include: [{model: DeviceInfo, as: 'info'}],
   })
-  return res.json(device)
+  res.json(device)
 }
