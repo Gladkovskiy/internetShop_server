@@ -22,9 +22,15 @@ export const create = async (req, res) => {
  */
 export const getAll = async (req, res) => {
   //забираем все записи с таблицы Type БД
-  const type = await Type.findAll()
+  const type = await Type.findAll({
+    //сортировка по быванию
+    // order: [['name', 'DESC']],
+    //сортировка по возростанию
+    order: [['name']],
+  })
+
   //сортировка массива с объектами по свойству name алфавит
-  type.sort((a, b) => {
+  /* type.sort((a, b) => {
     const nameA = a.name.toLowerCase()
     const nameB = b.name.toLowerCase()
     if (nameA < nameB)
@@ -32,7 +38,7 @@ export const getAll = async (req, res) => {
       return -1
     if (nameA > nameB) return 1
     return 0 // Никакой сортировки
-  })
+  }) */
   res.json(type)
 }
 
