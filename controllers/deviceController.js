@@ -2,7 +2,7 @@ import express from 'express'
 import {v4 as uuidv4} from 'uuid'
 import path from 'path'
 
-import {Device, DeviceInfo} from '../models/models.js'
+import {Device, DeviceInfo, Rating} from '../models/models.js'
 import ApiError from '../error/ApiError.js'
 
 /**
@@ -97,10 +97,14 @@ export const getOne = async (req, res) => {
   const {id} = req.params
   const device = await Device.findOne({
     where: {id},
+    attributes: ['id', 'name', 'price', 'img'],
     //и вытягиваем характеристики из DeviceInfo в массив info
     // в model должен быть прописан синоним 'info' в Devise.hasMany
     //так можно подтягивать данные с других баз подвязанных к этой
-    include: [{model: DeviceInfo, as: 'info'}],
+    include: [
+      {model: DeviceInfo, as: 'info', attributes: ['description', 'title']},
+      {model: Rating, attributes: ['rate', 'userId']},
+    ],
   })
   res.json(device)
 }
