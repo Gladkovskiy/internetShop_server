@@ -51,7 +51,7 @@ export const registration = async (req, res, next) => {
 
     res.json({token: jwtToken})
   } catch (error) {
-    next(ApiError.badRequest(error.message))
+    next(ApiError.internal(error.message))
   }
 }
 
@@ -68,13 +68,13 @@ export const login = async (req, res, next) => {
     //ищем пользователя, если нет выводим сообщение что такого нет
     const user = await User.findOne({where: {email}})
     if (!user) {
-      next(ApiError.internal('Пользователь с таким именем не найден'))
+      next(ApiError.badRequest('Пользователь с таким именем не найден'))
     }
 
     //если есть пользователь, сравниваем пароли, не совпали Неверный пароль
     let comparePassword = bcrypt.compareSync(password, user.password)
     if (!comparePassword) {
-      next(ApiError.internal('Неверный пароль'))
+      next(ApiError.badRequest('Неверный пароль'))
     }
 
     //считуем корзины id по юзеру

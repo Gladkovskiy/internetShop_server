@@ -20,11 +20,20 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
-//статическая раздача файлов
-app.use(express.static(path.resolve(path.resolve(), 'static')))
 //чтобы работал req.files для передачи файлов
 app.use(fileUpload({}))
 app.use('/api', router)
+
+//статическая раздача файлов
+//ищит файлы по названию по порядку use express.static
+//для nginx делаем /image чтобы в настройках прописать раздачу стаики
+// а в react добавляем в путь эту приставку
+app.use('/image', express.static(path.resolve(path.resolve(), './static')))
+//статическая раздача frontend(для nginx не надо, там идёт проксирование)
+app.use(express.static(path.resolve(path.resolve(), '../client/build')))
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(path.resolve(), '../client/build/index.html'))
+})
 
 //обработчик ошибок полдений Middleware
 app.use(errorHandler)

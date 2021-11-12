@@ -1,6 +1,7 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import ApiError from '../error/ApiError.js'
 
 dotenv.config()
 
@@ -19,11 +20,10 @@ const tokenValid = (req, res, next) => {
     }
     //из хэдера запроса забераем токен
     const jwtToken = req.headers.authorization.split(' ')[1] //токен 2е слово
-    //если токена нет то пшим сообщение не авторизирован
 
+    //если токена нет то пшим сообщение не авторизирован
     if (jwtToken === 'null') {
-      console.log(jwtToken)
-      return res.status(401).json({message: 'Пользователь не авторизован'})
+      next(ApiError.unauthorized('Пользователь не авторизован'))
     }
 
     //декодируем токен получаем id, email, role
@@ -34,7 +34,7 @@ const tokenValid = (req, res, next) => {
     req.user = decoded
     next()
   } catch (error) {
-    res.status(401).json(error.message)
+    next(ApiError.internal(error.message))
   }
 }
 
